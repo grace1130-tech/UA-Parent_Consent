@@ -8,10 +8,13 @@ import TeacherDashboard from "./pages/TeacherDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import CreateConsentForm from "./pages/CreateConsentForm";
 import TeacherConsentForms from "./pages/TeacherConsentForms";
+import TeacherConsentFormDetails from "./pages/TeacherConsentFormDetails";
 import ParentConsentForms from "./pages/ParentConsentForms";
 import ParentConsentDetails from "./pages/ParentConsentDetails";
 import TeacherResponses from "./pages/TeacherResponses";
 import TeacherResponseDetails from "./pages/TeacherResponseDetails";
+import TeacherParentLinkRequests from "./pages/TeacherParentLinkRequests";
+import TeacherStudentManagement from "./pages/TeacherStudentManagement";
 import UserManagement from "./pages/UserManagement";
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -80,6 +83,16 @@ function App() {
         }
       />
 
+      {/* Edit Existing Draft */}
+      <Route
+        path="/teacher-edit-consent-form/:id"
+        element={
+          <ProtectedRoute allowedRoles={["teacher"]}>
+            <CreateConsentForm />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/teacher-consent-forms"
         element={
@@ -90,10 +103,37 @@ function App() {
       />
 
       <Route
+        path="/teacher-consent-form/:id"
+        element={
+          <ProtectedRoute allowedRoles={["teacher"]}>
+            <TeacherConsentFormDetails />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/teacher-responses"
         element={
           <ProtectedRoute allowedRoles={["teacher"]}>
             <TeacherResponses />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/teacher-parent-link-requests"
+        element={
+          <ProtectedRoute allowedRoles={["teacher"]}>
+            <TeacherParentLinkRequests />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/teacher-students"
+        element={
+          <ProtectedRoute allowedRoles={["teacher"]}>
+            <TeacherStudentManagement />
           </ProtectedRoute>
         }
       />

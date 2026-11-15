@@ -1,3 +1,4 @@
+
 package com.yearners.ua_parent_consent_backend.repository;
 
 import com.yearners.ua_parent_consent_backend.model.ConsentForm;
@@ -16,6 +17,17 @@ public interface ConsentFormRepository extends JpaRepository<ConsentForm, Long> 
     List<ConsentForm> findByTeacherId(Long teacherId);
 
     List<ConsentForm> findByStatus(String status);
+
+    // Find published forms assigned to a specific student
+    @Query("""
+        SELECT cfs.consentForm
+        FROM ConsentFormStudent cfs
+        WHERE cfs.student.id = :studentId
+        AND cfs.consentForm.status = 'Published'
+    """)
+    List<ConsentForm> findPublishedFormsByStudentId(
+            @Param("studentId") Long studentId
+    );
 
     // Count submitted responses for each consent form
     @Query("""

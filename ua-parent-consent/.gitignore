@@ -1,5 +1,6 @@
+
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,23 +8,43 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Frontend - React and Vite
+node_modules/
+dist/
+dist-ssr/
+.vite/
 *.local
 
+# Backend - Spring Boot and Maven
+target/
+build/
+
+# Java
+*.class
+*.jar
+*.war
+hs_err_pid*
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+**/application-secret.properties
+
 # Editor directories and files
-.vscode/*
+.vscode/
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
+*.iml
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-# Environment variables and secrets
-.env
-.env.*
-!.env.example
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,3 +1,4 @@
+
 package com.yearners.ua_parent_consent_backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
@@ -6,6 +7,7 @@ import jakarta.validation.constraints.FutureOrPresent;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class CreateConsentFormRequest {
@@ -19,6 +21,12 @@ public class CreateConsentFormRequest {
     @NotBlank
     private String className;
 
+    @NotBlank
+    private String course;
+
+    @NotBlank
+    private String professor;
+
     @NotNull
     @FutureOrPresent
     private LocalDate activityDate;
@@ -31,4 +39,7 @@ public class CreateConsentFormRequest {
     private LocalDate deadline;
 
     private String instructions;
+
+    @NotNull
+    private List<Long> studentIds;
 }

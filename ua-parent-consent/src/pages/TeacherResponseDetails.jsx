@@ -35,8 +35,6 @@ function TeacherResponseDetails() {
 
         setResponse(selectedResponse);
 
-        // Activity information is included in the response DTO.
-        // Additional fields are retrieved from the teacher's forms.
         try {
           const forms = await apiRequest("/teacher/consent-forms");
 
@@ -155,15 +153,17 @@ function TeacherResponseDetails() {
     );
 
     if (consentForm) {
-      addText(`Class / Section: ${consentForm.className}`);
-      addText(`Activity Date: ${consentForm.activityDate}`);
-      addText(`Location: ${consentForm.location}`);
-      addText(`Submission Deadline: ${consentForm.deadline}`);
+      addText(`Class / Section: ${consentForm.className || "Not specified"}`);
+      addText(`Course: ${consentForm.course || "Not specified"}`);
+      addText(`Professor: ${consentForm.professor || "Not specified"}`);
+      addText(`Activity Date: ${consentForm.activityDate || "Not specified"}`);
+      addText(`Location: ${consentForm.location || "Not specified"}`);
+      addText(`Submission Deadline: ${consentForm.deadline || "Not specified"}`);
 
       y += 3;
 
       addText("ACTIVITY DESCRIPTION", 12, true);
-      addText(consentForm.description);
+      addText(consentForm.description || "No description provided.");
 
       addText("ADDITIONAL INSTRUCTIONS", 12, true);
       addText(
@@ -176,12 +176,28 @@ function TeacherResponseDetails() {
     pdf.line(margin, y, pageWidth - margin, y);
     y += 10;
 
+    // Student information
+    addText("STUDENT INFORMATION", 13, true);
+
+    addText(`Student Name: ${response.studentName || "Not available"}`);
+    addText(`Student Number: ${response.studentNumber || "Not available"}`);
+    addText(
+      `Student Section: ${
+        response.studentSection ||
+        consentForm?.className ||
+        "Not available"
+      }`
+    );
+
+    pdf.line(margin, y, pageWidth - margin, y);
+    y += 10;
+
     // Parent response
     addText("PARENT / GUARDIAN CONSENT RESPONSE", 13, true);
 
-    addText(`Parent Name: ${response.parentName}`);
-    addText(`Printed Name: ${response.printedName}`);
-    addText(`Consent Decision: ${response.decision}`);
+    addText(`Parent Name: ${response.parentName || "Not available"}`);
+    addText(`Printed Name: ${response.printedName || "Not provided"}`);
+    addText(`Consent Decision: ${response.decision || "Unknown"}`);
     addText(`Date Submitted: ${formatDate(response.submittedAt)}`);
 
     y += 5;
@@ -365,6 +381,16 @@ function TeacherResponseDetails() {
                 </div>
 
                 <div className="teacher-response-details-info-item">
+                  <span>Course</span>
+                  <strong>{consentForm.course || "Not specified"}</strong>
+                </div>
+
+                <div className="teacher-response-details-info-item">
+                  <span>Professor</span>
+                  <strong>{consentForm.professor || "Not specified"}</strong>
+                </div>
+
+                <div className="teacher-response-details-info-item">
                   <span>Activity Date</span>
                   <strong>{consentForm.activityDate || "Not specified"}</strong>
                 </div>
@@ -402,10 +428,43 @@ function TeacherResponseDetails() {
           )}
         </section>
 
-        {/* Parent Response */}
+        {/* Student Information */}
         <section className="teacher-response-details-card">
           <div className="teacher-response-details-card-heading">
             <div className="teacher-response-details-icon">02</div>
+
+            <div>
+              <h2>Student Information</h2>
+              <p>Student assigned to this consent form response.</p>
+            </div>
+          </div>
+
+          <div className="teacher-response-details-response-grid">
+            <div className="teacher-response-details-response-item">
+              <span>Student Name</span>
+              <strong>{response.studentName || "Not available"}</strong>
+            </div>
+
+            <div className="teacher-response-details-response-item">
+              <span>Student Number</span>
+              <strong>{response.studentNumber || "Not available"}</strong>
+            </div>
+
+            <div className="teacher-response-details-response-item">
+              <span>Class / Section</span>
+              <strong>
+                {response.studentSection ||
+                  consentForm?.className ||
+                  "Not available"}
+              </strong>
+            </div>
+          </div>
+        </section>
+
+        {/* Parent Response */}
+        <section className="teacher-response-details-card">
+          <div className="teacher-response-details-card-heading">
+            <div className="teacher-response-details-icon">03</div>
 
             <div>
               <h2>Parent / Guardian Response</h2>
@@ -451,7 +510,7 @@ function TeacherResponseDetails() {
         {/* Digital Signature */}
         <section className="teacher-response-details-card">
           <div className="teacher-response-details-card-heading">
-            <div className="teacher-response-details-icon">03</div>
+            <div className="teacher-response-details-icon">04</div>
 
             <div>
               <h2>Parent Digital Signature</h2>

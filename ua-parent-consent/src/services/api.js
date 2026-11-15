@@ -1,17 +1,16 @@
 
 import { isTokenExpired, logout } from "../utils/auth";
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"}/api`;
+const API_BASE_URL = `${
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"
+}/api`;
 
 export async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem("token");
 
-  // Check whether the JWT has expired
   if (token && isTokenExpired(token)) {
     logout();
-    throw new Error(
-      "Your session has expired. Please log in again."
-    );
+    throw new Error("Your session has expired. Please log in again.");
   }
 
   const headers = {
@@ -27,7 +26,6 @@ export async function apiRequest(endpoint, options = {}) {
     });
 
     const contentType = response.headers.get("content-type");
-
     let data = null;
 
     if (contentType && contentType.includes("json")) {
@@ -37,27 +35,21 @@ export async function apiRequest(endpoint, options = {}) {
       data = text ? { message: text } : null;
     }
 
-    // Handle all unauthorized responses, including missing tokens
     if (response.status === 401) {
       logout();
-      throw new Error(
-        "Your session has expired. Please log in again."
-      );
+      throw new Error("Your session has expired. Please log in again.");
     }
 
-    // Handle other unsuccessful responses
     if (!response.ok) {
-      const errorMessage =
+      throw new Error(
         data?.message ||
         data?.detail ||
         data?.error ||
-        `Request failed with status ${response.status}.`;
-
-      throw new Error(errorMessage);
+        `Request failed with status ${response.status}.`
+      );
     }
 
     return data;
-
   } catch (error) {
     console.error("API Request Error:", error);
 

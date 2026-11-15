@@ -1,3 +1,4 @@
+
 package com.yearners.ua_parent_consent_backend.model;
 
 import jakarta.persistence.*;
@@ -10,7 +11,12 @@ import java.time.LocalDateTime;
         name = "parent_consent_responses",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        columnNames = {"parent_id", "consent_form_id"}
+                        name = "uk_parent_form_student",
+                        columnNames = {
+                                "parent_id",
+                                "consent_form_id",
+                                "student_id"
+                        }
                 )
         }
 )
@@ -28,6 +34,10 @@ public class ParentConsentResponse {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "consent_form_id", nullable = false)
     private ConsentForm consentForm;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id")
+    private Student student;
 
     @Column(nullable = false)
     private String decision;

@@ -1,3 +1,4 @@
+
 package com.yearners.ua_parent_consent_backend.model;
 
 import jakarta.persistence.*;
@@ -22,6 +23,12 @@ public class ConsentForm {
 
     @Column(nullable = false)
     private String className;
+
+    @Column(length = 150)
+    private String course;
+
+    @Column(length = 150)
+    private String professor;
 
     @Column(nullable = false)
     private LocalDate activityDate;

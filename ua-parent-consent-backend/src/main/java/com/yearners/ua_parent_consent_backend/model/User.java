@@ -1,12 +1,16 @@
+
 package com.yearners.ua_parent_consent_backend.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
-@Data
 public class User {
 
     @Id
@@ -28,5 +32,13 @@ public class User {
     @Column(nullable = false)
     private String status = "Active";
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }

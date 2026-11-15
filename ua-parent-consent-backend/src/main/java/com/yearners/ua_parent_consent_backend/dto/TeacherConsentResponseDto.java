@@ -1,3 +1,4 @@
+
 package com.yearners.ua_parent_consent_backend.dto;
 
 import com.yearners.ua_parent_consent_backend.model.ParentConsentResponse;
@@ -12,6 +13,12 @@ public class TeacherConsentResponseDto {
     private Long formId;
     private String formTitle;
     private String className;
+
+    // Student information
+    private Long studentId;
+    private String studentName;
+    private String studentNumber;
+    private String studentSection;
 
     private Long parentId;
     private String parentName;
@@ -31,6 +38,19 @@ public class TeacherConsentResponseDto {
         dto.setFormId(response.getConsentForm().getId());
         dto.setFormTitle(response.getConsentForm().getTitle());
         dto.setClassName(response.getConsentForm().getClassName());
+
+        // Get student information
+        if (response.getStudent() != null) {
+            dto.setStudentId(response.getStudent().getId());
+            dto.setStudentName(response.getStudent().getFullName());
+            dto.setStudentNumber(response.getStudent().getStudentNumber());
+
+            if (response.getStudent().getSection() != null) {
+                dto.setStudentSection(
+                        response.getStudent().getSection().getName()
+                );
+            }
+        }
 
         dto.setParentId(response.getParent().getId());
         dto.setParentName(response.getParent().getFullName());

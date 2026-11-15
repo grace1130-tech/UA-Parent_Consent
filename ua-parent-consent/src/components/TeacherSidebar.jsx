@@ -14,6 +14,11 @@ function TeacherSidebar() {
       icon: "🏠"
     },
     {
+      name: "Student Management",
+      path: "/teacher-students",
+      icon: "🎓"
+    },
+    {
       name: "My Consent Forms",
       path: "/teacher-consent-forms",
       icon: "📄"
@@ -22,6 +27,11 @@ function TeacherSidebar() {
       name: "Parent Responses",
       path: "/teacher-responses",
       icon: "👥"
+    },
+    {
+      name: "Parent–Student Link Requests",
+      path: "/teacher-parent-link-requests",
+      icon: "🔗"
     }
   ];
 
@@ -31,6 +41,7 @@ function TeacherSidebar() {
 
   const handleLogout = () => {
     localStorage.removeItem("loggedInUser");
+    localStorage.removeItem("token");
     navigate("/login");
   };
 
@@ -86,14 +97,6 @@ function TeacherSidebar() {
         </nav>
 
         <div className="teacher-sidebar-bottom">
-          <div className="teacher-sidebar-help">
-            <span>ℹ️</span>
-            <div>
-              <strong>Need assistance?</strong>
-              <p>Contact your school administrator.</p>
-            </div>
-          </div>
-
           <button
             className="teacher-sidebar-logout"
             onClick={handleLogout}

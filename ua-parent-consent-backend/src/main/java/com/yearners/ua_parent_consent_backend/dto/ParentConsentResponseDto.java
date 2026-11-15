@@ -12,6 +12,12 @@ public class ParentConsentResponseDto {
     private Long id;
     private Long formId;
     private String formTitle;
+
+    private Long studentId;
+    private String studentName;
+    private String studentNumber;
+    private String studentSection;
+
     private String decision;
     private String printedName;
     private String signature;
@@ -25,6 +31,19 @@ public class ParentConsentResponseDto {
         dto.setId(response.getId());
         dto.setFormId(response.getConsentForm().getId());
         dto.setFormTitle(response.getConsentForm().getTitle());
+
+        if (response.getStudent() != null) {
+            dto.setStudentId(response.getStudent().getId());
+            dto.setStudentName(response.getStudent().getFullName());
+            dto.setStudentNumber(response.getStudent().getStudentNumber());
+
+            if (response.getStudent().getSection() != null) {
+                dto.setStudentSection(
+                        response.getStudent().getSection().getName()
+                );
+            }
+        }
+
         dto.setDecision(response.getDecision());
         dto.setPrintedName(response.getPrintedName());
         dto.setSignature(response.getSignature());

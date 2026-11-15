@@ -1,11 +1,19 @@
 
 import { useEffect, useRef, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import {
+  useParams,
+  Link,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import { apiRequest } from "../services/api";
 
 function ParentConsentDetails() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const studentId = searchParams.get("studentId");
+
   const navigate = useNavigate();
 
   const [form, setForm] = useState(null);
@@ -22,7 +30,7 @@ function ParentConsentDetails() {
   const drawingRef = useRef(false);
   const hasSignature = useRef(false);
 
-  // Load consent form and parent's response history
+  // Load the selected student's consent form and response
   useEffect(() => {
     let active = true;
 
@@ -31,21 +39,40 @@ function ParentConsentDetails() {
         setLoading(true);
         setLoadError("");
 
+        if (!studentId || !/^\d+$/.test(studentId)) {
+          throw new Error(
+            "Student information is missing. Please select a student from My Consent Forms."
+          );
+        }
+
         const [forms, responses] = await Promise.all([
           apiRequest("/parent/consent-forms"),
           apiRequest("/parent/consent-responses"),
         ]);
 
+        // Match both the consent form ID and student ID
         const selectedForm = forms.find(
-          (item) => String(item.id) === String(id)
+          (item) =>
+            String(item.id) === String(id) &&
+            String(item.studentId) === String(studentId)
         );
 
+        // Ignore legacy responses without studentId
         const submittedResponse = responses.find(
-          (item) => String(item.formId) === String(id)
+          (item) =>
+            String(item.formId) === String(id) &&
+            item.studentId != null &&
+            String(item.studentId) === String(studentId)
         );
+
+        if (!selectedForm) {
+          throw new Error(
+            "This consent form is not available for the selected student."
+          );
+        }
 
         if (active) {
-          setForm(selectedForm || null);
+          setForm(selectedForm);
           setExistingResponse(submittedResponse || null);
         }
       } catch (error) {
@@ -68,7 +95,7 @@ function ParentConsentDetails() {
     return () => {
       active = false;
     };
-  }, [id]);
+  }, [id, studentId]);
 
   // Set up signature canvas
   useEffect(() => {
@@ -213,6 +240,11 @@ function ParentConsentDetails() {
       return;
     }
 
+    if (!studentId || !/^\d+$/.test(studentId)) {
+      alert("Please select a valid student.");
+      return;
+    }
+
     if (!decision) {
       alert("Please select Agree or Disagree.");
       return;
@@ -242,6 +274,7 @@ function ParentConsentDetails() {
         {
           method: "POST",
           body: JSON.stringify({
+            studentId: Number(studentId),
             decision,
             printedName: cleanName,
             signature: signatureImage,
@@ -254,7 +287,6 @@ function ParentConsentDetails() {
       );
 
       navigate("/parent-consent-forms");
-
     } catch (error) {
       console.error("Submission error:", error);
 
@@ -353,11 +385,44 @@ function ParentConsentDetails() {
           </span>
         </header>
 
-        {/* Activity Information */}
+        {/* Student Information */}
         <section className="parent-consent-details-card">
           <div className="parent-consent-details-card-heading">
             <div className="parent-consent-details-icon">
               <span>01</span>
+            </div>
+
+            <div>
+              <h2>Student Information</h2>
+              <p>Confirm the student associated with this consent form.</p>
+            </div>
+          </div>
+
+          <div className="parent-consent-details-info-grid">
+            <div className="parent-consent-details-info-item">
+              <span>Student Name</span>
+              <strong>{form.studentName || "Not specified"}</strong>
+            </div>
+
+            <div className="parent-consent-details-info-item">
+              <span>Student Number</span>
+              <strong>{form.studentNumber || "Not specified"}</strong>
+            </div>
+
+            <div className="parent-consent-details-info-item">
+              <span>Student Section</span>
+              <strong>
+                {form.studentSection || form.className || "Not specified"}
+              </strong>
+            </div>
+          </div>
+        </section>
+
+        {/* Activity Information */}
+        <section className="parent-consent-details-card">
+          <div className="parent-consent-details-card-heading">
+            <div className="parent-consent-details-icon">
+              <span>02</span>
             </div>
 
             <div>
@@ -374,6 +439,16 @@ function ParentConsentDetails() {
             <div className="parent-consent-details-info-item">
               <span>Class / Section</span>
               <strong>{form.className || "Not specified"}</strong>
+            </div>
+
+            <div className="parent-consent-details-info-item">
+              <span>Course</span>
+              <strong>{form.course || "Not specified"}</strong>
+            </div>
+
+            <div className="parent-consent-details-info-item">
+              <span>Professor</span>
+              <strong>{form.professor || "Not specified"}</strong>
             </div>
 
             <div className="parent-consent-details-info-item">
@@ -410,7 +485,7 @@ function ParentConsentDetails() {
           <section className="parent-consent-details-card">
             <div className="parent-consent-details-card-heading">
               <div className="parent-consent-details-icon">
-                <span>02</span>
+                <span>03</span>
               </div>
 
               <div>
@@ -422,8 +497,9 @@ function ParentConsentDetails() {
             <div className="parent-consent-details-notice">
               <strong>Response Successfully Submitted</strong>
               <p>
-                You have already submitted your consent for this activity.
-                Another response cannot be submitted for this form.
+                You have already submitted your consent for this student
+                and activity. Another response cannot be submitted for
+                this form and student combination.
               </p>
             </div>
 
@@ -498,7 +574,7 @@ function ParentConsentDetails() {
           >
             <div className="parent-consent-details-card-heading">
               <div className="parent-consent-details-icon">
-                <span>02</span>
+                <span>03</span>
               </div>
 
               <div>

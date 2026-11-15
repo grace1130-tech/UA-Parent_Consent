@@ -17,8 +17,7 @@ function Sidebar() {
       name: "Consent Forms",
       path: "/parent-consent-forms",
       icon: "📄"
-    },
-
+    }
   ];
 
   useEffect(() => {
@@ -80,14 +79,6 @@ function Sidebar() {
         </nav>
 
         <div className="parent-sidebar-bottom">
-          <div className="parent-sidebar-help">
-            <span>ℹ️</span>
-            <div>
-              <strong>Need assistance?</strong>
-              <p>Contact your school administrator.</p>
-            </div>
-          </div>
-
           <button
             className="parent-sidebar-logout"
             onClick={handleLogout}

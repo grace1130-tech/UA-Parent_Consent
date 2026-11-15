@@ -1,3 +1,4 @@
+
 package com.yearners.ua_parent_consent_backend.config;
 
 import com.yearners.ua_parent_consent_backend.model.User;
@@ -19,8 +20,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final Set<String> ALLOWED_ROLES =
+            Set.of("PARENT", "TEACHER", "ADMIN");
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -68,17 +73,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             .trim()
                             .toUpperCase(Locale.ROOT);
 
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(
-                                    email,
-                                    null,
-                                    List.of(
-                                            new SimpleGrantedAuthority("ROLE_" + role)
-                                    )
-                            );
+                    if (ALLOWED_ROLES.contains(role)) {
 
-                    SecurityContextHolder.getContext()
-                            .setAuthentication(authentication);
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(
+                                        email,
+                                        null,
+                                        List.of(
+                                                new SimpleGrantedAuthority("ROLE_" + role)
+                                        )
+                                );
+
+                        SecurityContextHolder.getContext()
+                                .setAuthentication(authentication);
+                    }
                 }
             }
 

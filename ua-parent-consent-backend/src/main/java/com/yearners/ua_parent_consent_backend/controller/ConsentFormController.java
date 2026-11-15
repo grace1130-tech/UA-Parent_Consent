@@ -1,3 +1,4 @@
+
 package com.yearners.ua_parent_consent_backend.controller;
 
 import com.yearners.ua_parent_consent_backend.dto.CreateConsentFormRequest;
@@ -19,7 +20,8 @@ public class ConsentFormController {
     private final ConsentFormService consentFormService;
 
     public ConsentFormController(
-            ConsentFormService consentFormService) {
+            ConsentFormService consentFormService
+    ) {
         this.consentFormService = consentFormService;
     }
 
@@ -28,8 +30,8 @@ public class ConsentFormController {
     public ConsentFormResponse createForm(
             @Valid @RequestBody CreateConsentFormRequest request,
             @RequestParam(defaultValue = "Published") String status,
-            Authentication authentication) {
-
+            Authentication authentication
+    ) {
         return consentFormService.createForm(
                 request,
                 authentication.getName(),
@@ -39,9 +41,46 @@ public class ConsentFormController {
 
     @GetMapping
     public List<ConsentFormResponse> getMyForms(
-            Authentication authentication) {
-
+            Authentication authentication
+    ) {
         return consentFormService.getMyForms(
+                authentication.getName()
+        );
+    }
+
+    @GetMapping("/{formId}")
+    public ConsentFormResponse getFormById(
+            @PathVariable Long formId,
+            Authentication authentication
+    ) {
+        return consentFormService.getFormById(
+                formId,
+                authentication.getName()
+        );
+    }
+
+    // Edit an existing draft.
+    @PutMapping("/{formId}")
+    public ConsentFormResponse editDraft(
+            @PathVariable Long formId,
+            @Valid @RequestBody CreateConsentFormRequest request,
+            Authentication authentication
+    ) {
+        return consentFormService.editDraft(
+                formId,
+                request,
+                authentication.getName()
+        );
+    }
+
+    // Publish an existing draft.
+    @PatchMapping("/{formId}/publish")
+    public ConsentFormResponse publishDraft(
+            @PathVariable Long formId,
+            Authentication authentication
+    ) {
+        return consentFormService.publishDraft(
+                formId,
                 authentication.getName()
         );
     }

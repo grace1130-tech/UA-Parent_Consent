@@ -189,7 +189,17 @@ function TeacherConsentForms() {
                         <div className="teacher-forms-title-cell">
                           <div className="teacher-forms-file-icon">▤</div>
                           <div>
-                            <strong>{form.title}</strong>
+                            <strong>
+                              <Link
+                                to={`/teacher-consent-form/${form.id}`}
+                                style={{
+                                  color: "inherit",
+                                  textDecoration: "none"
+                                }}
+                              >
+                                {form.title}
+                              </Link>
+                            </strong>
                             <span>
                               Created{" "}
                               {form.createdAt

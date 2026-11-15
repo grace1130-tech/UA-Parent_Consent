@@ -27,8 +27,8 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(
             JwtService jwtService,
-            UserRepository userRepository) {
-
+            UserRepository userRepository
+    ) {
         return new JwtAuthenticationFilter(
                 jwtService,
                 userRepository
@@ -38,8 +38,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            JwtAuthenticationFilter jwtAuthenticationFilter)
-            throws Exception {
+            JwtAuthenticationFilter jwtAuthenticationFilter
+    ) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
@@ -74,12 +74,21 @@ public class SecurityConfig {
 
                         .requestMatchers("/error").permitAll()
 
-                        .requestMatchers("/api/parent/**")
-                        .hasRole("PARENT")
+                        // Parent-only endpoints.
+                        .requestMatchers(
+                                "/api/parent/**",
+                                "/api/parent-student-links/request",
+                                "/api/parent-student-links/my-links"
+                        ).hasRole("PARENT")
 
-                        .requestMatchers("/api/teacher/**")
-                        .hasRole("TEACHER")
+                        // Teacher-only endpoints.
+                        .requestMatchers(
+                                "/api/teacher/**",
+                                "/api/parent-student-links/pending",
+                                "/api/parent-student-links/*/review"
+                        ).hasRole("TEACHER")
 
+                        // Admin-only endpoints.
                         .requestMatchers("/api/admin/**")
                         .hasRole("ADMIN")
 
@@ -113,6 +122,7 @@ public class SecurityConfig {
                         "GET",
                         "POST",
                         "PUT",
+                        "PATCH",
                         "DELETE",
                         "OPTIONS"
                 )

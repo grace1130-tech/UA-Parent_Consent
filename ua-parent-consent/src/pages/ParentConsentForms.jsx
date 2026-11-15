@@ -14,6 +14,19 @@ function ParentConsentForms() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Find a response belonging to the exact form and student.
+  // Legacy responses without studentId are intentionally ignored.
+  const findStudentResponse = (savedResponses, form) => {
+    if (!form.studentId) return undefined;
+
+    return savedResponses.find(
+      (item) =>
+        String(item.formId) === String(form.id) &&
+        item.studentId != null &&
+        String(item.studentId) === String(form.studentId)
+    );
+  };
+
   // Load consent forms and parent responses from PostgreSQL
   useEffect(() => {
     let active = true;
@@ -29,9 +42,7 @@ function ParentConsentForms() {
         ]);
 
         const updatedForms = publishedForms.map((form) => {
-          const response = savedResponses.find(
-            (item) => String(item.formId) === String(form.id)
-          );
+          const response = findStudentResponse(savedResponses, form);
 
           return {
             ...form,
@@ -79,9 +90,14 @@ function ParentConsentForms() {
   // Search and status filtering
   const filteredForms = useMemo(() => {
     return forms.filter((form) => {
+      const search = searchTerm.toLowerCase();
+
       const matchesSearch =
-        form.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        form.className?.toLowerCase().includes(searchTerm.toLowerCase());
+        form.title?.toLowerCase().includes(search) ||
+        form.className?.toLowerCase().includes(search) ||
+        form.studentName?.toLowerCase().includes(search) ||
+        form.studentNumber?.toLowerCase().includes(search) ||
+        form.studentSection?.toLowerCase().includes(search);
 
       let matchesStatus = true;
 
@@ -167,6 +183,13 @@ function ParentConsentForms() {
 
     pdf.line(margin, y, pageWidth - margin, y);
     y += 10;
+
+    addText("STUDENT INFORMATION", 13, true);
+    addText(`Student Name: ${form.studentName || "—"}`);
+    addText(`Student Number: ${form.studentNumber || "—"}`);
+    addText(`Student Section: ${form.studentSection || form.className || "—"}`);
+
+    y += 3;
 
     addText("ACTIVITY DETAILS", 13, true);
     addText(`Activity Title: ${form.title}`, 11, true);
@@ -360,7 +383,7 @@ function ParentConsentForms() {
 
               <input
                 type="text"
-                placeholder="Search activity or class..."
+                placeholder="Search activity, class, or student..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -436,6 +459,7 @@ function ParentConsentForms() {
                 <thead>
                   <tr>
                     <th>ACTIVITY</th>
+                    <th>STUDENT</th>
                     <th>CLASS</th>
                     <th>ACTIVITY DATE</th>
                     <th>DEADLINE</th>
@@ -446,13 +470,12 @@ function ParentConsentForms() {
 
                 <tbody>
                   {filteredForms.map((form) => {
-                    const response = responses.find(
-                      (item) =>
-                        String(item.formId) === String(form.id)
-                    );
+                    const response = findStudentResponse(responses, form);
 
                     return (
-                      <tr key={form.id}>
+                      <tr
+                        key={`${form.id}-${form.studentId}`}
+                      >
                         <td>
                           <div className="parent-forms-title-cell">
                             <div className="parent-forms-file-icon">
@@ -467,8 +490,19 @@ function ParentConsentForms() {
                         </td>
 
                         <td>
+                          <div className="parent-forms-title-cell">
+                            <div>
+                              <strong>{form.studentName || "—"}</strong>
+                              <span>
+                                {form.studentNumber || "No student number"}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td>
                           <span className="parent-forms-class">
-                            {form.className || "—"}
+                            {form.studentSection || form.className || "—"}
                           </span>
                         </td>
 
@@ -493,7 +527,7 @@ function ParentConsentForms() {
                         <td>
                           <div className="parent-forms-actions">
                             <Link
-                              to={`/parent-consent-form/${form.id}`}
+                              to={`/parent-consent-form/${form.id}?studentId=${form.studentId}`}
                               className="parent-forms-view"
                             >
                               {response ? "View Details" : "Respond"}

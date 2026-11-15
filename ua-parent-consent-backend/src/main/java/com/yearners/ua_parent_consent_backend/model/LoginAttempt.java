@@ -1,13 +1,16 @@
+
 package com.yearners.ua_parent_consent_backend.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "login_attempts")
-@Data
 public class LoginAttempt {
 
     @Id
